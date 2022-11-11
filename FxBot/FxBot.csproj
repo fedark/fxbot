@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -6,13 +6,19 @@
 	<Nullable>enable</Nullable>
   </PropertyGroup>
 
+	<Choose>
+		<When Condition=" '$(Configuration)'=='Release' ">
+			<ItemGroup>
+				<Content Include="export_chart.py">
+					<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+				</Content>
+			</ItemGroup>
+		</When>
+	</Choose>
+
 	<ItemGroup>
 		<PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
 		<PackageReference Include="Telegram.Bot" Version="18.0.0" />
 	</ItemGroup>
-
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-	  <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;  copy /Y &quot;$(ProjectDir)export_chart.py&quot; &quot;$(TargetDir)&quot;&#xD;&#xA;)" />
-	</Target>	
 	
 </Project>
