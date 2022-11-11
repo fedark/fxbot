@@ -12,7 +12,11 @@ namespace FxBot
 {
 	public class FxRateService : IFxRateService
 	{
-		private static readonly string WorkingDirectory = @"..\..\..\..\";
+#if DEBUG
+		private static readonly string ScriptLocation = @"..\..\..\";
+#else
+		private static readonly string ScriptLocation = @".";
+#endif
 		private static readonly string PointsFileName = "points.out";
 		private static readonly string ChartFileName = "image.png";
 		private static readonly string DateFormat = "yyyy-MM-dd";
@@ -51,7 +55,7 @@ namespace FxBot
 			ExportPoints(rates);
 			ExportChart();
 
-			var stream = new FileStream(Path.Combine(WorkingDirectory, ChartFileName), FileMode.Open, FileAccess.Read, FileShare.Read);
+			var stream = new FileStream(ChartFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
 			return (stream, ChartFileName);
 
 			static DateTime minDate(DateTime date1, DateTime date2) => date1 < date2 ? date1 : date2;
@@ -102,7 +106,7 @@ namespace FxBot
 
 		private static void ExportPoints(IEnumerable<FxRate> rates)
 		{
-			using var file = new StreamWriter(Path.Combine(WorkingDirectory, PointsFileName));
+			using var file = new StreamWriter(PointsFileName);
 
 			foreach (var rate in rates)
 			{
@@ -116,8 +120,8 @@ namespace FxBot
 			var startInfo = new ProcessStartInfo
 			{
 				FileName = "python.exe",
-				WorkingDirectory = WorkingDirectory,
-				Arguments = $"export_chart.py {PointsFileName} {ChartFileName}",
+				WorkingDirectory = ".",
+				Arguments = $"{Path.Combine(ScriptLocation, "export_chart.py")} {PointsFileName} {ChartFileName}",
 				UseShellExecute = false,
 				RedirectStandardOutput = true
 			};

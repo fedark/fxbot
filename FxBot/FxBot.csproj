@@ -9,6 +9,10 @@
 	<ItemGroup>
 		<PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
 		<PackageReference Include="Telegram.Bot" Version="18.0.0" />
-	</ItemGroup>	
+	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	  <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;  copy /Y &quot;$(ProjectDir)export_chart.py&quot; &quot;$(TargetDir)&quot;&#xD;&#xA;)" />
+	</Target>	
 	
 </Project>
