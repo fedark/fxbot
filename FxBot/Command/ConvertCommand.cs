@@ -42,11 +42,20 @@ namespace FxBot
 			if (result is not null)
 			{
 				var (value, date) = result.Value;
+				var now = DateTime.Now;
 
-				var rate = await fxRateService_.GetFxRate(date);
-				var valueInForCcy = value / rate;
+				if (date <= now)
+				{
+					var rate = await fxRateService_.GetFxRate(date);
+					var valueInForCcy = Math.Round(value / rate, 4);
 
-				await botClient.SendTextMessageAsync(message.Chat.Id, valueInForCcy.ToString(), replyMarkup: new ReplyKeyboardRemove());
+					await botClient.SendTextMessageAsync(message.Chat.Id, $"${valueInForCcy}", replyMarkup: new ReplyKeyboardRemove());
+				}
+				else
+				{
+					var futureDateReply = (date - now).TotalDays <= 30 ? "Дохуя." : "А ты не охуел с такими запросами?";
+					await botClient.SendTextMessageAsync(message.Chat.Id, futureDateReply, replyMarkup: new ReplyKeyboardRemove());
+				}
 			}
 		}
 

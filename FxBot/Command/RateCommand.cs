@@ -41,8 +41,18 @@ namespace FxBot
 			var date = TryParseDateCommand(message.Text) ?? TryParseDayCommand(message.Text);
 			if (date is not null)
 			{
-				var rate = await fxRateService_.GetFxRate(date.Value);
-				await botClient.SendTextMessageAsync(message.Chat.Id, rate.ToString(), replyMarkup: new ReplyKeyboardRemove());
+				var now = DateTime.Now;
+
+				if (date.Value <= now)
+				{
+					var rate = await fxRateService_.GetFxRate(date.Value);
+					await botClient.SendTextMessageAsync(message.Chat.Id, rate.ToString(), replyMarkup: new ReplyKeyboardRemove());
+				}
+				else
+				{
+					var futureDateReply = (date.Value - now).TotalDays <= 30 ? "Губа не дура." : "А ты не охуел с такими запросами?";
+					await botClient.SendTextMessageAsync(message.Chat.Id, futureDateReply, replyMarkup: new ReplyKeyboardRemove());
+				}
 			}
 		}
 
