@@ -18,8 +18,8 @@ namespace FxBot
 		private readonly ITelegramBotClient botClient_;
 
 		private readonly DynamicCommand dynamicCommand_;
-		private readonly DateCommand dateCommand_;
-		private readonly DayCommand dayCommand_;
+		private readonly RateCommand rateCommand_;
+		private readonly ConvertCommand convertCommand_;
 		private readonly List<ICommand> commands_;
 
 		#endregion
@@ -31,9 +31,9 @@ namespace FxBot
 			botClient_ = new TelegramBotClient(token);
 
 			dynamicCommand_ = new(getCommandName("CommandDynamic"), fxRateService);
-			dateCommand_ = new(getCommandName("CommandDate"), fxRateService);
-			dayCommand_ = new(getCommandName("CommandDay"), fxRateService);
-			commands_ = new() { dynamicCommand_, dateCommand_, dayCommand_ };
+			rateCommand_ = new(getCommandName("CommandRate"), fxRateService);
+			convertCommand_ = new(getCommandName("CommandConvert"), fxRateService);
+			commands_ = new() { dynamicCommand_, rateCommand_, convertCommand_ };
 
 			static string getCommandName(string setting)
 			{
@@ -90,7 +90,7 @@ namespace FxBot
 			{
 				if (command.IsMatch(message.Text))
 				{
-					await command.Run(botClient, message);
+					await command.RunAsync(botClient, message);
 				}
 			}
 		}
@@ -100,7 +100,7 @@ namespace FxBot
 			if (callbackQuery is null)
 				return;
 
-			await dynamicCommand_.ProcessReply(botClient, callbackQuery);
+			await dynamicCommand_.ProcessReplyAsync(botClient, callbackQuery);
 		}
 
 		private static Task UnknownUpdateAsync()

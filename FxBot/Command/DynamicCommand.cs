@@ -37,7 +37,7 @@ namespace FxBot
 			return message == Name;
 		}
 
-		public async Task Run(ITelegramBotClient botClient, Message message)
+		public async Task RunAsync(ITelegramBotClient botClient, Message message)
 		{
 			var keyboardMarkup = new InlineKeyboardMarkup(
 				new[]
@@ -48,7 +48,7 @@ namespace FxBot
 			await botClient.SendTextMessageAsync(message.Chat.Id, DynamicOptionsMessage, replyMarkup: keyboardMarkup);
 		}
 
-		public async Task ProcessReply(ITelegramBotClient botClient, CallbackQuery callbackQuery)
+		public async Task ProcessReplyAsync(ITelegramBotClient botClient, CallbackQuery callbackQuery)
 		{
 			if (callbackQuery.Message is null || !DateTime.TryParse(callbackQuery.Data, out DateTime date))
 				return;

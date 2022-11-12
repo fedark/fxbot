@@ -9,6 +9,6 @@ namespace FxBot
 		string Name { get; }
 
 		bool IsMatch(string message);
-		Task Run(ITelegramBotClient botClient, Message message);
+		Task RunAsync(ITelegramBotClient botClient, Message message);
 	}
 }
