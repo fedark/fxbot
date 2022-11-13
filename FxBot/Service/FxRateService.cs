@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using CliWrap;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -53,7 +54,7 @@ namespace FxBot
 
 			var rates = ParseRates(rateResponce);
 			ExportPoints(rates);
-			ExportChart();
+			await ExportChartAsync();
 
 			var stream = new FileStream(ChartFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
 			return (stream, ChartFileName);
@@ -115,19 +116,11 @@ namespace FxBot
 			}
 		}
 
-		private static void ExportChart()
+		private static async Task ExportChartAsync()
 		{
-			var startInfo = new ProcessStartInfo
-			{
-				FileName = "python.exe",
-				WorkingDirectory = ".",
-				Arguments = $"{Path.Combine(ScriptLocation, "export_chart.py")} {PointsFileName} {ChartFileName}",
-				UseShellExecute = false,
-				RedirectStandardOutput = true
-			};
-
-			var process = Process.Start(startInfo);
-			process?.WaitForExit();
+			await Cli.Wrap("python3")
+				.WithArguments($"{Path.Combine(ScriptLocation, "export_chart.py")} {PointsFileName} {ChartFileName}")
+				.ExecuteAsync();
 		}
 	}
 }
