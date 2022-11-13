@@ -15,8 +15,10 @@ namespace FxBot
 	{
 #if DEBUG
 		private static readonly string ScriptLocation = @"..\..\..\";
+		private static readonly string ScriptProgram = "python";
 #else
 		private static readonly string ScriptLocation = @".";
+		private static readonly string ScriptProgram = "python3";
 #endif
 		private static readonly string PointsFileName = "points.out";
 		private static readonly string ChartFileName = "image.png";
@@ -118,7 +120,7 @@ namespace FxBot
 
 		private static async Task ExportChartAsync()
 		{
-			await Cli.Wrap("python3")
+			await Cli.Wrap(ScriptProgram)
 				.WithArguments($"{Path.Combine(ScriptLocation, "export_chart.py")} {PointsFileName} {ChartFileName}")
 				.ExecuteAsync();
 		}
