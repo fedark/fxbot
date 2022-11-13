@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot;
@@ -13,7 +12,7 @@ namespace FxBot
 	public class DynamicCommand : ICommand
 	{
 		private static readonly string DynamicOptionsMessage = "Выберите период.";
-		private static readonly string DateFormat = ConfigurationManager.AppSettings["DateFormat"] ?? "yyyy-MM-dd";
+		private static readonly string DateFormat = Settings.GetRequired(Settings.DateFormatKey);
 
 		private static readonly List<(string, string)> SuggestedPeriods = new()
 		{

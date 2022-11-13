@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FxBot
 {
@@ -9,16 +9,11 @@ namespace FxBot
     {
         public static async Task Main(string[] args)
         {
-            var botToken = ConfigurationManager.AppSettings["BotToken"];
-            if (botToken is null)
-			{
-				Console.WriteLine($"Well, shit: Bot token is not found.");
-                return;
-			}
+			var serviceProvider = Configure();
 
 			try
 			{
-				var bot = new Bot(botToken, new FxRateService());
+				var bot = serviceProvider.GetRequiredService<Bot>();
 
 				using var cancelSource = new CancellationTokenSource();
 
@@ -32,5 +27,14 @@ namespace FxBot
 				Console.WriteLine($"Well, shit: {e.Message}.");
 			}
         }
-    }
+
+		public static IServiceProvider Configure()
+		{
+			var services = new ServiceCollection();
+			services.AddSingleton<IFxRateService, FxRateService>();
+			services.AddSingleton<Bot>(provider => new(Settings.GetRequired(Settings.BotTokenKey), provider.GetRequiredService<IFxRateService>()));
+
+			return services.BuildServiceProvider();
+		}
+	}
 }

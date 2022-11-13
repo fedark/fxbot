@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
@@ -30,21 +29,10 @@ namespace FxBot
 		{
 			botClient_ = new TelegramBotClient(token);
 
-			dynamicCommand_ = new(getCommandName("CommandDynamic"), fxRateService);
-			rateCommand_ = new(getCommandName("CommandRate"), fxRateService);
-			convertCommand_ = new(getCommandName("CommandConvert"), fxRateService);
+			dynamicCommand_ = new(Settings.GetRequired(Settings.CommandDynamicKey), fxRateService);
+			rateCommand_ = new(Settings.GetRequired(Settings.CommandRateKey), fxRateService);
+			convertCommand_ = new(Settings.GetRequired(Settings.CommandConvertKey), fxRateService);
 			commands_ = new() { dynamicCommand_, rateCommand_, convertCommand_ };
-
-			static string getCommandName(string setting)
-			{
-				var commandName = ConfigurationManager.AppSettings[setting];
-				if (commandName is null)
-				{
-					throw new Exception($"Command name under '{setting}' setting is not found");
-				}
-
-				return commandName;
-			}
 		}
 
 		public async Task Start(CancellationToken cancelToken)
