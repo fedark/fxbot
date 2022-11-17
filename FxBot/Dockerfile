@@ -9,7 +9,7 @@ RUN dotnet publish -c Release -o publish
 
 # build app container
 
-FROM mcr.microsoft.com/dotnet/aspnet:5.0
+FROM mcr.microsoft.com/dotnet/runtime:5.0
 WORKDIR /fxbot
 COPY --from=build /fxbot/publish .
 
