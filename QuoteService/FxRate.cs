@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace FxBot
+namespace QuoteService
 {
     public class FxRate
     {

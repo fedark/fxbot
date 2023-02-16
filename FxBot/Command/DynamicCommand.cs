@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using QuoteService;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
@@ -52,7 +53,7 @@ namespace FxBot
 			if (callbackQuery.Message is null || !DateTime.TryParse(callbackQuery.Data, out DateTime date))
 				return;
 
-			var (stream, file) = await fxRateService_.GetChart(date);
+			var (stream, file) = await fxRateService_.GetChartAsync(date);
 
 			try
 			{

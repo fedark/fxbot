@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using QuoteService;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -45,7 +46,7 @@ namespace FxBot
 
 				if (date.Value <= now)
 				{
-					var rate = await fxRateService_.GetFxRate(date.Value);
+					var rate = await fxRateService_.GetFxRateAsync(date.Value);
 					await botClient.SendTextMessageAsync(message.Chat.Id, rate.ToString(), replyMarkup: new ReplyKeyboardRemove());
 				}
 				else

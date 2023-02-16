@@ -8,12 +8,12 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace FxBot
+namespace QuoteService
 {
 	public class FxRateService : IFxRateService
 	{
 #if DEBUG
-		private static readonly string ScriptLocation = @"..\..\..\";
+		private static readonly string ScriptLocation = @"..\..\..\..\QuoteService";
 		private static readonly string ScriptProgram = "python";
 #else
 		private static readonly string ScriptLocation = @".";
@@ -23,14 +23,14 @@ namespace FxBot
 		private static readonly string ChartFileName = "image.png";
 		private static readonly string DateFormat = "yyyy-MM-dd";
 
-		public async Task<double> GetFxRate(DateTime date)
+		public async Task<double> GetFxRateAsync(DateTime date)
 		{
 			var rateResponce = await GetRateResponceAsync(date, date);
 			var rates = ParseRates(rateResponce);
 			return GetDenominatedValue(rates.Single());
 		}
 
-		public async Task<(Stream, string)> GetChart(DateTime startDate)
+		public async Task<(Stream, string)> GetChartAsync(DateTime startDate)
 		{
 			var schedule = new List<(DateTime, DateTime)>();
 			var currentStartDate = startDate;
@@ -90,7 +90,7 @@ namespace FxBot
 
 		private static IEnumerable<FxRate> ParseRates(IEnumerable<string> responce)
 		{
-			return responce.SelectMany(r => JsonConvert.DeserializeObject<List<FxRate>>(r)).OrderBy(r => r.Date);
+			return responce.SelectMany(r => JsonConvert.DeserializeObject<List<FxRate>>(r)!).OrderBy(r => r.Date);
 		}
 
 		private static double GetDenominatedValue(FxRate rate)
