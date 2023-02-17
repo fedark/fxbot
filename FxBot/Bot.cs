@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using FxBot.Commands.Abstractions;
-using QuoteService;
+using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
@@ -28,9 +28,9 @@ namespace FxBot
 
 		#region Public Methods
 
-		public Bot(string token, IEnumerable<ICommand> commands)
+		public Bot(IOptions<BotSettings> options, IEnumerable<ICommand> commands)
 		{
-			botClient_ = new TelegramBotClient(token);
+			botClient_ = new TelegramBotClient(options.Value.Token);
 
 			foreach (var command in commands)
 			{
@@ -39,7 +39,7 @@ namespace FxBot
 			}
 		}
 
-		public async Task Start(CancellationToken cancelToken)
+		public async Task StartAsync(CancellationToken cancelToken)
 		{
 			// allow all updates
 			var receiverOptions = new ReceiverOptions { AllowedUpdates = { } };

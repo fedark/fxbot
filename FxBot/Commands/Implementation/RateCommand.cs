@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using FxBot.Commands.Abstractions;
+using Microsoft.Extensions.Options;
 using QuoteService;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -11,7 +12,7 @@ namespace FxBot.Commands.Implementation
 	{
 		private readonly IFxRateService fxRateService_;
 
-		public RateCommand(string name, IFxRateService fxRateService) : base(name, 
+		public RateCommand(IOptions<CommandSettings> options, IFxRateService fxRateService) : base(options.Value.Names[nameof(RateCommand)], 
 			new[] { @"(\d{4}-\d{2}-\d{2})", @"(\d{1,2})" })
 		{
 			fxRateService_ = fxRateService;
