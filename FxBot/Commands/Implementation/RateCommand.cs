@@ -12,7 +12,7 @@ namespace FxBot.Commands.Implementation
 	{
 		private readonly IFxRateService fxRateService_;
 
-		public RateCommand(IOptions<CommandSettings> options, IFxRateService fxRateService) : base(options.Value.Names[nameof(RateCommand)], 
+		public RateCommand(IOptions<CommandSettings> options, IFxRateService fxRateService) : base(options.Value.Names[nameof(RateCommand)],
 			new[] { @"(\d{4}-\d{2}-\d{2})", @"(\d{1,2})" })
 		{
 			fxRateService_ = fxRateService;
@@ -58,7 +58,7 @@ namespace FxBot.Commands.Implementation
 				&& int.TryParse(match.Groups[1].Value, out var day) && day >= 1
 				&& DateTime.Now is var now && day <= DateTime.DaysInMonth(now.Year, now.Month))
 			{
-				date =  new DateTime(now.Year, now.Month, day);
+				date = new DateTime(now.Year, now.Month, day);
 				return true;
 			}
 

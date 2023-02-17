@@ -6,9 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 namespace FxBot
 {
 	public class Program
-    {
-        public static async Task Main(string[] args)
-        {
+	{
+		public static async Task Main(string[] args)
+		{
 			try
 			{
 				var serviceProvider = Configure();
@@ -25,7 +25,7 @@ namespace FxBot
 			{
 				Console.WriteLine($"Well, shit: {e.Message}.");
 			}
-        }
+		}
 
 		public static IServiceProvider Configure()
 		{

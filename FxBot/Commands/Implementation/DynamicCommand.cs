@@ -46,8 +46,10 @@ namespace FxBot.Commands.Implementation
 
 		public override async Task ProcessReplyAsync(ITelegramBotClient botClient, CallbackQuery callbackQuery)
 		{
-			if (callbackQuery.Message is null || !DateTime.TryParse(callbackQuery.Data, out DateTime date))
+			if (callbackQuery.Message is null || !DateTime.TryParse(callbackQuery.Data, out var date))
+			{
 				return;
+			}
 
 			var (stream, file) = await fxRateService_.GetChartAsync(date);
 
