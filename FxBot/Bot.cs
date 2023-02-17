@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using FxBot.Commands.Abstractions;
 using QuoteService;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
@@ -17,23 +18,25 @@ namespace FxBot
 
 		private readonly ITelegramBotClient botClient_;
 
-		private readonly DynamicCommand dynamicCommand_;
-		private readonly RateCommand rateCommand_;
-		private readonly ConvertCommand convertCommand_;
-		private readonly List<ICommand> commands_;
+		private delegate Task MessageEventHandler(ITelegramBotClient botClient, Message message);
+		private delegate Task CallbackQueryEventHandler(ITelegramBotClient botClient, CallbackQuery callbackQuery);
+
+		private event MessageEventHandler? MessageEvent;
+		private event CallbackQueryEventHandler? CallbackQueryEvent;
 
 		#endregion
 
 		#region Public Methods
 
-		public Bot(string token, IFxRateService fxRateService)
+		public Bot(string token, IEnumerable<ICommand> commands)
 		{
 			botClient_ = new TelegramBotClient(token);
 
-			dynamicCommand_ = new(Settings.GetRequired(Settings.CommandDynamicKey), fxRateService);
-			rateCommand_ = new(Settings.GetRequired(Settings.CommandRateKey), fxRateService);
-			convertCommand_ = new(Settings.GetRequired(Settings.CommandConvertKey), fxRateService);
-			commands_ = new() { dynamicCommand_, rateCommand_, convertCommand_ };
+			foreach (var command in commands)
+			{
+				MessageEvent += command.RunIfMatchAsync;
+				CallbackQueryEvent += command.ProcessReplyAsync;
+			}
 		}
 
 		public async Task Start(CancellationToken cancelToken)
@@ -70,26 +73,24 @@ namespace FxBot
 			}
 		}
 
-		private async Task OnMessageReceivedAsync(ITelegramBotClient botClient, Message? message)
+		private Task OnMessageReceivedAsync(ITelegramBotClient botClient, Message? message)
 		{
-			if (message is null || message.Text is null)
-				return;
-
-			foreach (var command in commands_)
+			if (message is not null && MessageEvent is not null)
 			{
-				if (command.IsMatch(message.Text))
-				{
-					await command.RunAsync(botClient, message);
-				}
+				return MessageEvent(botClient, message);
 			}
+
+			return Task.CompletedTask;
 		}
 
-		private async Task OnCallbackQueryReceivedAsync(ITelegramBotClient botClient, CallbackQuery? callbackQuery)
+		private Task OnCallbackQueryReceivedAsync(ITelegramBotClient botClient, CallbackQuery? callbackQuery)
 		{
-			if (callbackQuery is null)
-				return;
+			if (callbackQuery is not null && CallbackQueryEvent is not null)
+			{
+				CallbackQueryEvent(botClient, callbackQuery);
+			}
 
-			await dynamicCommand_.ProcessReplyAsync(botClient, callbackQuery);
+			return Task.CompletedTask;
 		}
 
 		private static Task UnknownUpdateAsync()

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using FxBot.Commands.Abstractions;
+using FxBot.Commands.Implementation;
 using Microsoft.Extensions.DependencyInjection;
 using QuoteService;
 
@@ -33,7 +35,10 @@ namespace FxBot
 		{
 			var services = new ServiceCollection();
 			services.AddSingleton<IFxRateService, FxRateService>();
-			services.AddSingleton<Bot>(provider => new(Settings.GetRequired(Settings.BotTokenKey), provider.GetRequiredService<IFxRateService>()));
+			services.AddSingleton<ICommand, DynamicCommand>(provider => new(Settings.GetRequired(Settings.CommandDynamicKey), provider.GetRequiredService<IFxRateService>()));
+			services.AddSingleton<ICommand, RateCommand>(provider => new(Settings.GetRequired(Settings.CommandRateKey), provider.GetRequiredService<IFxRateService>()));
+			services.AddSingleton<ICommand, ConvertCommand>(provider => new(Settings.GetRequired(Settings.CommandConvertKey), provider.GetRequiredService<IFxRateService>()));
+			services.AddSingleton<Bot>(provider => new(Settings.GetRequired(Settings.BotTokenKey), provider.GetServices<ICommand>()));
 
 			return services.BuildServiceProvider();
 		}

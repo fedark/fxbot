@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FxBot.Commands.Abstractions;
 using QuoteService;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace FxBot
+namespace FxBot.Commands.Implementation
 {
-	public class DynamicCommand : ICommand
+	public class DynamicCommand : MessageCommand
 	{
 		private static readonly string DynamicOptionsMessage = "Выберите период.";
 		private static readonly string DateFormat = Settings.GetRequired(Settings.DateFormatKey);
@@ -24,20 +25,13 @@ namespace FxBot
 
 		private readonly IFxRateService fxRateService_;
 
-		public string Name { get; }
 
-		public DynamicCommand(string name, IFxRateService fxRateService)
+		public DynamicCommand(string name, IFxRateService fxRateService) : base(name)
 		{
-			Name = name;
 			fxRateService_ = fxRateService;
 		}
 
-		public bool IsMatch(string message)
-		{
-			return message == Name;
-		}
-
-		public async Task RunAsync(ITelegramBotClient botClient, Message message)
+		protected override async Task RunAsync(ITelegramBotClient botClient, Message message)
 		{
 			var keyboardMarkup = new InlineKeyboardMarkup(
 				new[]
@@ -48,7 +42,7 @@ namespace FxBot
 			await botClient.SendTextMessageAsync(message.Chat.Id, DynamicOptionsMessage, replyMarkup: keyboardMarkup);
 		}
 
-		public async Task ProcessReplyAsync(ITelegramBotClient botClient, CallbackQuery callbackQuery)
+		public override async Task ProcessReplyAsync(ITelegramBotClient botClient, CallbackQuery callbackQuery)
 		{
 			if (callbackQuery.Message is null || !DateTime.TryParse(callbackQuery.Data, out DateTime date))
 				return;
