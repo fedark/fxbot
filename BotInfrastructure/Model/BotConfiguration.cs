@@ -1,4 +1,4 @@
-﻿namespace FxBot.Configuration;
+﻿namespace BotInfrastructure.Model;
 
 public class BotConfiguration
 {

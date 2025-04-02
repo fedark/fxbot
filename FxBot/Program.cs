@@ -1,8 +1,9 @@
-﻿using FxBot;
-using FxBot.Commands;
-using FxBot.Commands.Abstractions;
-using FxBot.Commands.Implementation;
-using FxBot.Configuration;
+﻿using BotInfrastructure.Impl;
+using BotInfrastructure.Impl.Command;
+using BotInfrastructure.Interface;
+using BotInfrastructure.Interface.Command;
+using BotInfrastructure.Model;
+using FxBot;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -59,5 +60,5 @@ static void ConfigureServices(IServiceCollection services)
 	services.AddSingleton<ICommand, RateCommand>();
 	services.AddSingleton<ICommand, ConvertCommand>();
 
-	services.AddSingleton<Bot>();
+	services.AddSingleton<IBot, Bot>();
 }

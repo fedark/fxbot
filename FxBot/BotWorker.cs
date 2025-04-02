@@ -1,10 +1,11 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using BotInfrastructure.Interface;
 using Microsoft.Extensions.Hosting;
 
 namespace FxBot;
 
-public class BotWorker(Bot bot) : IHostedService
+public class BotWorker(IBot bot) : IHostedService
 {
 	public Task StartAsync(CancellationToken cancellationToken)
 	{

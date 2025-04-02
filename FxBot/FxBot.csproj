@@ -20,10 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Telegram.Bot" Version="22.4.4" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\BotInfrastructure\BotInfrastructure.csproj" />
     <ProjectReference Include="..\QuoteService\QuoteService.csproj" />
   </ItemGroup>
   
