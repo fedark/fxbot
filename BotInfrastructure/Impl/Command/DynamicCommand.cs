@@ -36,7 +36,7 @@ public class DynamicCommand : MessageCommand
 			_suggestedPeriods.Select(d => InlineKeyboardButton.WithCallbackData(d.Item2, d.Item1))
 		]);
 
-		await botClient.SendMessage(message.Chat.Id, DynamicOptionsMessage, replyMarkup: keyboardMarkup);
+		await botClient.SendMessage(message.Chat.Id, DynamicOptionsMessage, replyMarkup: keyboardMarkup).ConfigureAwait(false);
 	}
 
 	public override async Task ProcessReplyAsync(ITelegramBotClient botClient, CallbackQuery callbackQuery)
@@ -48,6 +48,6 @@ public class DynamicCommand : MessageCommand
 
 		await using var fileStream = await _fxRateService.GetChartAsync(date).ConfigureAwait(false);
 
-		await botClient.SendPhoto(callbackQuery.Message.Chat.Id, new InputFileStream(fileStream));
+		await botClient.SendPhoto(callbackQuery.Message.Chat.Id, new InputFileStream(fileStream)).ConfigureAwait(false);
 	}
 }

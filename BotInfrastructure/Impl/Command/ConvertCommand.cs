@@ -15,7 +15,7 @@ public class ConvertCommand(IOptions<CommandConfiguration> options, IFxRateServi
 		if (message.Text is null ||
 		    !(TryParseDateCommand(message.Text, out var value, out var date) || TryParseDayCommand(message.Text, out value, out date)))
 		{
-			await WarnInvalidAsync(botClient, message.Chat, "17.45 2022-06-01", "17.45 9");
+			await WarnInvalidAsync(botClient, message.Chat, "17.45 2022-06-01", "17.45 9").ConfigureAwait(false);
 			return;
 		}
 
@@ -23,14 +23,14 @@ public class ConvertCommand(IOptions<CommandConfiguration> options, IFxRateServi
 
 		if (date <= now)
 		{
-			var rate = await fxRateService.GetFxRateAsync(date);
+			var rate = await fxRateService.GetFxRateAsync(date).ConfigureAwait(false);
 			var valueInForCcy = Math.Round(value / rate, 4);
 
-			await botClient.SendMessage(message.Chat.Id, $"${valueInForCcy}");
+			await botClient.SendMessage(message.Chat.Id, $"${valueInForCcy}").ConfigureAwait(false);
 		}
 		else
 		{
-			await botClient.SendMessage(message.Chat.Id, "Не умею предсказывать будущее.");
+			await botClient.SendMessage(message.Chat.Id, "Не умею предсказывать будущее.").ConfigureAwait(false);
 		}
 	}
 

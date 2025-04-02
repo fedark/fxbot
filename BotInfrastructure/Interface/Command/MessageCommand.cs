@@ -22,9 +22,7 @@ public abstract class MessageCommand(string name) : NamedCommand(name)
 	protected async Task WarnInvalidAsync(ITelegramBotClient botClient, Chat chat, params string[] exampleArguments)
 	{
 		if (exampleArguments.Length < 1)
-		{
 			return;
-		}
 
 		var usage = new StringBuilder();
 		usage.AppendLine("Правильно, например, так:");
