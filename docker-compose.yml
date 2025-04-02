@@ -1,0 +1,5 @@
+services:
+  fxbot:
+    build: .
+    image: fedark/fxbot
+    container_name: fxbot

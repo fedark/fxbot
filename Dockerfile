@@ -1,27 +1,26 @@
-# build app
+# syntax=docker/dockerfile:1-labs
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS sdk
-WORKDIR /fxbot
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
 
-COPY ./FxBot/*.csproj ./FxBot/
-COPY ./QuoteService/*.csproj ./QuoteService/
-RUN dotnet restore ./FxBot/FxBot.csproj
+COPY --parents=true */*.csproj .
+RUN dotnet restore FxBot/FxBot.csproj
 
-COPY ./FxBot/. ./FxBot/
-COPY ./QuoteService/. ./QuoteService/
-WORKDIR /fxbot/FxBot
-RUN dotnet publish -c Release -o publish
+COPY . .
+RUN dotnet build FxBot/FxBot.csproj -c ${BUILD_CONFIGURATION} -o /src/build --no-restore
 
 
-# build app container
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish FxBot/FxBot.csproj -c ${BUILD_CONFIGURATION} -o /app/publish
 
-FROM mcr.microsoft.com/dotnet/runtime:5.0 AS runtime
-WORKDIR /fxbot
-COPY --from=sdk /fxbot/FxBot/publish ./
 
+FROM mcr.microsoft.com/dotnet/runtime:8.0 AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
 
 # configure python
-
 RUN apt-get update -y
 RUN apt-get install -y python3
 RUN apt-get install -y python3-pip
