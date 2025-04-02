@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using FxBot.Commands.Abstractions;
+using FxBot.Configuration;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
@@ -12,11 +13,11 @@ using Telegram.Bot.Types.Enums;
 
 namespace FxBot
 {
-	public class Bot
+    public class Bot
 	{
 		#region Private Fields
 
-		private readonly ITelegramBotClient botClient_;
+		private readonly ITelegramBotClient _botClient;
 
 		private delegate Task MessageEventHandler(ITelegramBotClient botClient, Message message);
 		private delegate Task CallbackQueryEventHandler(ITelegramBotClient botClient, CallbackQuery callbackQuery);
@@ -28,9 +29,9 @@ namespace FxBot
 
 		#region Public Methods
 
-		public Bot(IOptions<BotSettings> options, IEnumerable<ICommand> commands)
+		public Bot(IOptions<BotConfiguration> options, IEnumerable<ICommand> commands)
 		{
-			botClient_ = new TelegramBotClient(options.Value.Token);
+			_botClient = new TelegramBotClient(options.Value.Token);
 
 			foreach (var command in commands)
 			{
@@ -43,9 +44,9 @@ namespace FxBot
 		{
 			// allow all updates
 			var receiverOptions = new ReceiverOptions { AllowedUpdates = { } };
-
-			botClient_.StartReceiving(HandleUpdateAsync, HandleError, receiverOptions, cancelToken);
-			var bot = await botClient_.GetMeAsync(cancelToken);
+			
+			_botClient.StartReceiving(HandleUpdateAsync, HandleError, receiverOptions, cancelToken);
+			var bot = await _botClient.GetMe(cancelToken);
 
 			Console.WriteLine($"Start listening for @{bot.Username}");
 		}

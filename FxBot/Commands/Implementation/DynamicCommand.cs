@@ -4,10 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using FxBot.Commands.Abstractions;
 using Microsoft.Extensions.Options;
-using QuoteService;
+using QuoteService.Interface;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FxBot.Commands.Implementation
@@ -20,7 +19,7 @@ namespace FxBot.Commands.Implementation
 		private readonly IFxRateService fxRateService_;
 
 
-		public DynamicCommand(IOptions<CommandSettings> options, IFxRateService fxRateService) : base(options.Value.Names[nameof(DynamicCommand)])
+		public DynamicCommand(IOptions<CommandConfiguration> options, IFxRateService fxRateService) : base(options.Value.Names[nameof(DynamicCommand)])
 		{
 			var dateFormat = options.Value.DateFormat;
 			suggestedPeriods_ = new()
@@ -51,11 +50,11 @@ namespace FxBot.Commands.Implementation
 				return;
 			}
 
-			var (stream, file) = await fxRateService_.GetChartAsync(date);
+			var fileStream = await fxRateService_.GetChartAsync(date);
 
 			try
 			{
-				await botClient.SendPhotoAsync(callbackQuery.Message.Chat.Id, new InputOnlineFile(stream, file));
+				await botClient.SendPhotoAsync(callbackQuery.Message.Chat.Id, new InputFileStream(fileStream));
 			}
 			catch (Exception)
 			{
@@ -63,7 +62,7 @@ namespace FxBot.Commands.Implementation
 			}
 			finally
 			{
-				stream.Dispose();
+				await fileStream.DisposeAsync();
 			}
 		}
 	}

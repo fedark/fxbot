@@ -1,38 +1,63 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using FxBot;
+using FxBot.Commands;
+using FxBot.Commands.Abstractions;
+using FxBot.Commands.Implementation;
+using FxBot.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using QuoteService.Impl;
+using QuoteService.Interface;
+using QuoteService.Model;
 
-namespace FxBot
+var appBuilder = Host.CreateDefaultBuilder(args);
+
+appBuilder.ConfigureServices((context, services) =>
 {
-	public class Program
+	MapConfiguration(context.Configuration, services);
+	ConfigureServices(services);
+
+	services.AddHostedService<BotWorker>();
+});
+
+await appBuilder.Build().RunAsync();
+
+return;
+
+static void MapConfiguration(IConfiguration configuration, IServiceCollection services)
+{
+	services.AddOptions();
+
+	services.Configure<BotConfiguration>(c =>
 	{
-		public static async Task Main(string[] args)
-		{
-			try
-			{
-				var serviceProvider = Configure();
-				var bot = serviceProvider.GetRequiredService<Bot>();
+		var botSection = configuration.GetRequiredSection("Bot");
+		c.Token = botSection.GetRequired("Token");
+	});
 
-				using var cancelSource = new CancellationTokenSource();
+	services.Configure<CommandConfiguration>(c =>
+	{
+		var botSection = configuration.GetRequiredSection("Bot");
+		var commandsSection = botSection.GetRequiredSection("Commands");
 
-				await bot.StartAsync(cancelSource.Token);
+		c.Names[nameof(DynamicCommand)] = commandsSection.GetRequired("Dynamic");
+		c.Names[nameof(RateCommand)] = commandsSection.GetRequired("Rate");
+		c.Names[nameof(ConvertCommand)] = commandsSection.GetRequired("Convert");
 
-				Console.ReadLine();
-				cancelSource.Cancel();
-			}
-			catch (Exception e)
-			{
-				Console.WriteLine($"Well, shit: {e.Message}.");
-			}
-		}
+		c.DateFormat = botSection.GetRequired("DateFormat");
+	});
 
-		public static IServiceProvider Configure()
-		{
-			var setup = new Setup();
-			var services = new ServiceCollection();
-			setup.ConfigureServices(services);
-			return services.BuildServiceProvider();
-		}
-	}
+	services.Configure<FxRateApiConfiguration>(configuration.GetRequiredSection("QuoteService:FxRateApi"));
+	services.Configure<ScriptConfiguration>(configuration.GetRequiredSection("QuoteService:Script"));
+}
+
+static void ConfigureServices(IServiceCollection services)
+{
+	services.AddSingleton<IFxRateClient, FxRateClient>();
+	services.AddSingleton<IFxRateService, FxRateService>();
+
+	services.AddSingleton<ICommand, DynamicCommand>();
+	services.AddSingleton<ICommand, RateCommand>();
+	services.AddSingleton<ICommand, ConvertCommand>();
+
+	services.AddSingleton<Bot>();
 }
