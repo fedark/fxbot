@@ -16,7 +16,8 @@ ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish FxBot/FxBot.csproj -c ${BUILD_CONFIGURATION} -o /app/publish
 
 
-FROM mcr.microsoft.com/dotnet/runtime:8.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+ARG PYTHON_ENV=py_env
 WORKDIR /app
 COPY --from=publish /app/publish .
 
@@ -24,7 +25,8 @@ COPY --from=publish /app/publish .
 RUN apt-get update -y
 RUN apt-get install -y python3
 RUN apt-get install -y python3-pip
-RUN python3 -m pip install --upgrade pip wheel setuptools
-RUN python3 -m pip install matplotlib
+RUN apt-get install -y python3-venv
+RUN python3 -m venv ${PYTHON_ENV}
+RUN ${PYTHON_ENV}/bin/pip install matplotlib
 
 ENTRYPOINT ["dotnet", "FxBot.dll"]

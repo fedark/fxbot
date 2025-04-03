@@ -349,6 +349,7 @@
 **/*.sql
 **/*.md
 **/*.txt
+**/launchSettings.json
 
 
 # custom folders
@@ -359,5 +360,6 @@
 **/DevOps
 **/buildtools
 **/packages
+**/Properties
 
 # custom projects

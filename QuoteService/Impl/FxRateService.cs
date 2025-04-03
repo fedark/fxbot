@@ -10,7 +10,7 @@ using QuoteService.Model;
 
 namespace QuoteService.Impl;
 
-public class FxRateService(IOptions<ScriptConfiguration> scriptOptions, IFxRateClient fxRateClient) : IFxRateService
+public class FxRateService(IOptions<ScriptConfiguration> options, IFxRateClient fxRateClient) : IFxRateService
 {
 	private static readonly DateTime DenominationDate1 = new(2000, 1, 1);
 	private static readonly DateTime DenominationDate2 = new(2016, 1, 1);
@@ -41,7 +41,7 @@ public class FxRateService(IOptions<ScriptConfiguration> scriptOptions, IFxRateC
 		ExportPoints(orderedRates);
 		await ExportChartAsync().ConfigureAwait(false);
 
-		return new FileStream(scriptOptions.Value.ChartFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+		return new FileStream(options.Value.ChartFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
 	}
 	
 	#endregion
@@ -82,19 +82,24 @@ public class FxRateService(IOptions<ScriptConfiguration> scriptOptions, IFxRateC
 
 	private void ExportPoints(IEnumerable<FxRate> rates)
 	{
-		using var file = new StreamWriter(scriptOptions.Value.PointsFileName);
+		using var file = new StreamWriter(options.Value.PointsFileName);
 
 		foreach (var rate in rates)
 		{
 			var denominatedValue = Denominate(rate);
-			file.WriteLine($"{rate.Date.ToString(scriptOptions.Value.ExportDateFormat)},{denominatedValue}");
+			file.WriteLine($"{rate.Date.ToString(options.Value.ExportDateFormat)},{denominatedValue}");
 		}
 	}
 
 	private Task ExportChartAsync()
 	{
-		return Cli.Wrap(scriptOptions.Value.CliProgram)
-			.WithArguments($"{scriptOptions.Value.ScriptFullName} {scriptOptions.Value.PointsFileName} {scriptOptions.Value.ChartFileName}")
+		var target = options.Value.CliProgram;
+		var script = options.Value.ScriptFullName;
+		var points = options.Value.PointsFileName;
+		var chart = options.Value.ChartFileName;
+
+		return Cli.Wrap(target)
+			.WithArguments($"{script} {points} {chart}")
 			.ExecuteAsync();
 	}
 
