@@ -5,15 +5,10 @@ using Microsoft.Extensions.Hosting;
 
 namespace FxBot;
 
-public class BotWorker(IBot bot) : IHostedService
+public class BotWorker(IBot bot) : BackgroundService
 {
-	public Task StartAsync(CancellationToken cancellationToken)
+	protected override Task ExecuteAsync(CancellationToken stoppingToken)
 	{
-		return bot.StartAsync(cancellationToken);
-	}
-
-	public Task StopAsync(CancellationToken cancellationToken)
-	{
-		return Task.CompletedTask;
+		return bot.StartAsync(stoppingToken);
 	}
 }
