@@ -1,5 +1,4 @@
 ﻿using BotInfrastructure.Interface;
-using BotInfrastructure.Interface.Command;
 using BotInfrastructure.Model;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;

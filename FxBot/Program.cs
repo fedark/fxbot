@@ -1,7 +1,6 @@
 ﻿using BotInfrastructure.Impl;
 using BotInfrastructure.Impl.Command;
 using BotInfrastructure.Interface;
-using BotInfrastructure.Interface.Command;
 using BotInfrastructure.Model;
 using FxBot;
 using Microsoft.Extensions.Configuration;
