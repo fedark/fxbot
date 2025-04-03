@@ -24,7 +24,7 @@ public class HistoryCommand : RegexCommand, IRepliableCommand, IHistoryCommand
         var dateFormat = options.Value.DateFormat;
 
         _hotIntervals = commandOptions.Value.HotIntervals
-	        .Select(i => (today.AddMonths(i.FromMonthsAgo).ToString(dateFormat), i.Title))
+	        .Select(i => (today.AddMonths(-i.FromMonthsAgo).ToString(dateFormat), i.Title))
 	        .ToArray();
 
         _commandOptions = commandOptions;
