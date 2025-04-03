@@ -33,16 +33,13 @@ static void MapConfiguration(IConfiguration configuration, IServiceCollection se
 
 	services.Configure<BotConfiguration>(c =>
 	{
-		var botSection = configuration.GetRequiredSection("Bot");
-		c.Token = botSection.GetRequired("Token");
+		c.Token = configuration.GetRequired("Bot:Token");
 	});
 
 	services.Configure<CommandConfiguration>(c =>
 	{
-		var botSection = configuration.GetRequiredSection("Bot");
-
-		c.PriceFormat = botSection.GetRequired("PriceFormat");
-		c.DateFormat = botSection.GetRequired("DateFormat");
+		c.PriceFormat = configuration.GetRequired("Bot:PriceFormat");
+		c.DateFormat = configuration.GetRequired("Bot:DateFormat");
 	});
 
 	services.Configure<HistoryCommandConfiguration>(configuration.GetRequiredSection("Bot:Commands:History"));
