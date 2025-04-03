@@ -1,4 +1,5 @@
 ﻿using BotInfrastructure.Interface;
+using BotInfrastructure.Interface.Command;
 using BotInfrastructure.Model;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
@@ -9,32 +10,15 @@ using Telegram.Bot.Types.Enums;
 
 namespace BotInfrastructure.Impl
 {
-    public class Bot : IBot
-	{
+    public class Bot(IOptions<BotConfiguration> options, ICommand chain, IRepliableCommand replyChain) : IBot
+    {
 		#region Private Fields
 
-		private readonly ITelegramBotClient _botClient;
-
-		private delegate Task MessageEventHandler(ITelegramBotClient botClient, Message message);
-		private delegate Task CallbackQueryEventHandler(ITelegramBotClient botClient, CallbackQuery callbackQuery);
-
-		private event MessageEventHandler? MessageEvent;
-		private event CallbackQueryEventHandler? CallbackQueryEvent;
+		private readonly ITelegramBotClient _botClient = new TelegramBotClient(options.Value.Token);
 
 		#endregion
 
 		#region Public Methods
-
-		public Bot(IOptions<BotConfiguration> options, IEnumerable<ICommand> commands)
-		{
-			_botClient = new TelegramBotClient(options.Value.Token);
-
-			foreach (var command in commands)
-			{
-				MessageEvent += command.RunIfMatchAsync;
-				CallbackQueryEvent += command.ProcessReplyAsync;
-			}
-		}
 
 		public async Task StartAsync(CancellationToken cancelToken)
 		{
@@ -72,9 +56,9 @@ namespace BotInfrastructure.Impl
 
 		private Task OnMessageReceivedAsync(ITelegramBotClient botClient, Message? message)
 		{
-			if (message is not null && MessageEvent is not null)
+			if (message is not null)
 			{
-				return MessageEvent(botClient, message);
+				return chain.ApplyAsync(botClient, message);
 			}
 
 			return Task.CompletedTask;
@@ -82,9 +66,9 @@ namespace BotInfrastructure.Impl
 
 		private Task OnCallbackQueryReceivedAsync(ITelegramBotClient botClient, CallbackQuery? callbackQuery)
 		{
-			if (callbackQuery is not null && CallbackQueryEvent is not null)
+			if (callbackQuery is not null)
 			{
-				CallbackQueryEvent(botClient, callbackQuery);
+				return replyChain.ReplyAsync(botClient, callbackQuery);
 			}
 
 			return Task.CompletedTask;

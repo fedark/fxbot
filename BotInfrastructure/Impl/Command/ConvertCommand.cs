@@ -1,66 +1,61 @@
 ﻿using BotInfrastructure.Abstract;
+using BotInfrastructure.Interface;
 using BotInfrastructure.Model;
 using Microsoft.Extensions.Options;
 using QuoteService.Interface;
+using System.Diagnostics.CodeAnalysis;
+using BotInfrastructure.Interface.Command;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace BotInfrastructure.Impl.Command;
 
-public class ConvertCommand(IOptions<CommandConfiguration> options, IFxRateService fxRateService)
-    : MultipleRegexCommand(options.Value.Names[nameof(ConvertCommand)], [@"([+-]?\d*\.?\d+) (\d{4}-\d{2}-\d{2})", @"([+-]?\d*\.?\d+) (\d{1,2})$"])
+public class ConvertCommand(IOptions<CommandConfiguration> options,
+	IParser parser,
+	IFxRateService fxRateService)
+    : RegexCommand(@"(([+-]?\d*\.?\d+) ((\d{4}-\d{2}-\d{2})|(\d{1,2})))"), IConvertCommand
 {
-    protected override async Task RunAsync(ITelegramBotClient botClient, Message message)
-    {
-        if (message.Text is null ||
-            !(TryParseDateCommand(message.Text, out var value, out var date) || TryParseDayCommand(message.Text, out value, out date)))
-        {
-            await WarnInvalidAsync(botClient, message.Chat, "17.45 2022-06-01", "17.45 9").ConfigureAwait(false);
-            return;
-        }
+	protected override bool CanApply(Message message)
+	{
+		return base.CanApply(message) &&
+		       TryParseMessage(message.Text!, out _, out _);
+	}
 
-        var now = DateTime.Now;
+	protected override async Task ApplyInternalAsync(ITelegramBotClient botClient, Message message)
+	{
+		if (!TryParseMessage(message.Text!, out var value, out var date))
+			return;
 
-        if (date <= now)
-        {
-            var rate = await fxRateService.GetFxRateAsync(date).ConfigureAwait(false);
-            var valueInForCcy = Math.Round(value / rate, 4);
+		string result;
 
-            await botClient.SendMessage(message.Chat.Id, $"${valueInForCcy}").ConfigureAwait(false);
-        }
-        else
-        {
-            await botClient.SendMessage(message.Chat.Id, "Не умею предсказывать будущее.").ConfigureAwait(false);
-        }
-    }
+		if (date <= DateTime.Now)
+		{
+			var rate = await fxRateService.GetFxRateAsync(date.Value);
+			var valueInForCcy = value.Value / rate;
 
-    private bool TryParseDateCommand(string message, out double value, out DateTime date)
-    {
-        if (ValidRegexes[0].Match(message) is { Success: true } match
-            && double.TryParse(match.Groups[1].Value, out value)
-            && DateTime.TryParse(match.Groups[2].Value, out date))
-        {
-            return true;
-        }
+			result = $"${valueInForCcy.ToString(options.Value.PriceFormat)}";
+		}
+		else
+		{
+			result = "I don't know future";
+		}
 
-        value = default;
-        date = default;
-        return false;
-    }
+		await botClient.SendMessage(message.Chat.Id, result).ConfigureAwait(false);
+	}
 
-    private bool TryParseDayCommand(string message, out double value, out DateTime date)
-    {
-        if (ValidRegexes[1].Match(message) is { Success: true } match
-            && double.TryParse(match.Groups[1].Value, out value)
-            && int.TryParse(match.Groups[2].Value, out var day) && day >= 1
-            && DateTime.Now is var now && day <= DateTime.DaysInMonth(now.Year, now.Month))
-        {
-            date = new DateTime(now.Year, now.Month, day);
-            return true;
-        }
+	private bool TryParseMessage(string message, [NotNullWhen(true)] out double? value, [NotNullWhen(true)] out DateTime? date)
+	{
+		value = default;
+		date = default;
 
-        value = default;
-        date = default;
-        return false;
-    }
+		if (Regex.Match(message) is not { Success: true } match)
+			return false;
+
+        if (!double.TryParse(match.Groups[2].Value, out var parsedValue))
+            return false;
+
+        value = parsedValue;
+
+		return parser.TryParseDateOrDay(message, match.Groups[4], match.Groups[5], out date);
+	}
 }

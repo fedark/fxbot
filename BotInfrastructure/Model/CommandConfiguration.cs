@@ -2,6 +2,6 @@
 
 public class CommandConfiguration
 {
-	public required Dictionary<string, string> Names { get; set; } = new();
+	public required string PriceFormat { get; set; }
 	public required string DateFormat { get; set; }
 }

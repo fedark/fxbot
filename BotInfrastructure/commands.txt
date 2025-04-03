@@ -1,3 +1,3 @@
-﻿dynam - График курса за большие периоды
-rate - Курс на любую дату или любой день текущего месяца
-conv - Конвертировать число в валюту на любую дату или день
+﻿{date} or {day} - Fx rate value on any date or any day of current month in the past
+{value} {date} or {value} {day} - Convert value to foreign curryncy on any date or any day of current month in the past
+history - Rate dynamics plot for a date range
