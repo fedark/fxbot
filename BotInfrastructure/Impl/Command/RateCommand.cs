@@ -49,6 +49,6 @@ public class RateCommand(IOptions<CommandConfiguration> options,
 			return false;
         }
 
-        return parser.TryParseDateOrDay(message, match.Groups[2], match.Groups[3], out date);
+        return parser.TryParseDateOrDay(match.Groups[2], match.Groups[3], out date);
     }
 }

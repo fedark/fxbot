@@ -6,7 +6,7 @@ namespace BotInfrastructure.Impl;
 
 public class Parser : IParser
 {
-	public bool TryParseDateOrDay(string dateOrDay, Group dateGroup, Group dayGroup, [NotNullWhen(true)] out DateTime? date)
+	public bool TryParseDateOrDay(Group dateGroup, Group dayGroup, [NotNullWhen(true)] out DateTime? date)
 	{
 		if (dateGroup.Success &&
 		    DateTime.TryParse(dateGroup.Value, out var parsedDate))

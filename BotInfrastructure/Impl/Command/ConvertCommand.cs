@@ -3,7 +3,8 @@ using BotInfrastructure.Interface;
 using BotInfrastructure.Model;
 using Microsoft.Extensions.Options;
 using QuoteService.Interface;
-using System.Diagnostics.CodeAnalysis;
+using System.Text;
+using System.Text.RegularExpressions;
 using BotInfrastructure.Interface.Command;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -13,49 +14,62 @@ namespace BotInfrastructure.Impl.Command;
 public class ConvertCommand(IOptions<CommandConfiguration> options,
 	IParser parser,
 	IFxRateService fxRateService)
-    : RegexCommand(@"(([+-]?\d*\.?\d+) ((\d{4}-\d{2}-\d{2})|(\d{1,2})))"), IConvertCommand
+    : RegexCommand(@"(([+-]?\d*\.?\d+) ((\d{4}-\d{2}-\d{2})|(\d{1,2})))", RegexOptions.Multiline), IConvertCommand
 {
 	protected override bool CanApply(Message message)
 	{
 		return base.CanApply(message) &&
-		       TryParseMessage(message.Text!, out _, out _);
+		       TryParseMessage(message.Text!, out _);
 	}
 
 	protected override async Task ApplyInternalAsync(ITelegramBotClient botClient, Message message)
 	{
-		if (!TryParseMessage(message.Text!, out var value, out var date))
+		if (!TryParseMessage(message.Text!, out var args))
 			return;
 
-		string result;
+		var result = new StringBuilder();
 
-		if (date <= DateTime.Now)
+		foreach (var (value, date) in args)
 		{
-			var rate = await fxRateService.GetFxRateAsync(date.Value);
-			var valueInForCcy = value.Value / rate;
+			if (date <= DateTime.Now)
+			{
+				var rate = await fxRateService.GetFxRateAsync(date);
+				var valueInForCcy = value / rate;
 
-			result = $"${valueInForCcy.ToString(options.Value.PriceFormat)}";
-		}
-		else
-		{
-			result = "I don't know future";
+				result.AppendLine($"${valueInForCcy.ToString(options.Value.PriceFormat)}");
+			}
+			else
+			{
+				result.AppendLine("I don't know future");
+			}
 		}
 
-		await botClient.SendMessage(message.Chat.Id, result).ConfigureAwait(false);
+		await botClient.SendMessage(message.Chat.Id, result.ToString()).ConfigureAwait(false);
 	}
 
-	private bool TryParseMessage(string message, [NotNullWhen(true)] out double? value, [NotNullWhen(true)] out DateTime? date)
+	private bool TryParseMessage(string message, out (double, DateTime)[] args)
 	{
-		value = default;
-		date = default;
+		args = [];
 
-		if (Regex.Match(message) is not { Success: true } match)
+		var matches = Regex.Matches(message);
+		if (!matches.Any())
 			return false;
 
-        if (!double.TryParse(match.Groups[2].Value, out var parsedValue))
-            return false;
+		var result = new List<(double, DateTime)>();
 
-        value = parsedValue;
+		foreach (Match match in matches)
+		{
+			if (!match.Success)
+				return false;
 
-		return parser.TryParseDateOrDay(message, match.Groups[4], match.Groups[5], out date);
+			if (!double.TryParse(match.Groups[2].Value, out var value) ||
+			    !parser.TryParseDateOrDay(match.Groups[4], match.Groups[5], out var date))
+				return false;
+
+			result.Add((value, date.Value));
+		}
+
+		args = result.ToArray();
+		return true;
 	}
 }
