@@ -51,15 +51,15 @@ public class ConvertCommand(IOptions<CommandConfiguration> options,
 	{
 		args = [];
 
-		var matches = Regex.Matches(message);
-		if (!matches.Any())
+		var lines = message.Split("\n");
+		if (!lines.Any())
 			return false;
 
 		var result = new List<(double, DateTime)>();
 
-		foreach (Match match in matches)
+		foreach (var line in lines)
 		{
-			if (!match.Success)
+			if (Regex.Match(line) is not { Success: true } match)
 				return false;
 
 			if (!double.TryParse(match.Groups[2].Value, out var value) ||
