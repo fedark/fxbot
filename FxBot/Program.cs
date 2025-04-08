@@ -18,6 +18,7 @@ var appBuilder = Host.CreateDefaultBuilder(args);
 appBuilder.ConfigureServices((context, services) =>
 {
 	MapConfiguration(context.Configuration, services);
+	ConfigureCaching(context.Configuration, services);
 	ConfigureServices(services);
 
 	services.AddHostedService<BotWorker>();
@@ -46,6 +47,17 @@ static void MapConfiguration(IConfiguration configuration, IServiceCollection se
 
 	services.Configure<FxRateApiConfiguration>(configuration.GetRequiredSection("QuoteService:FxRateApi"));
 	services.Configure<ScriptConfiguration>(configuration.GetRequiredSection("QuoteService:Script"));
+}
+
+static void ConfigureCaching(IConfiguration configuration, IServiceCollection services)
+{
+    services.AddStackExchangeRedisCache(options =>
+    {
+		options.Configuration = configuration.GetRequired("Redis:Configuration");
+		options.InstanceName = configuration.GetRequired("Redis:InstanceName");
+    });
+
+	services.AddSingleton<ICacheService, CacheService>();
 }
 
 static void ConfigureServices(IServiceCollection services)

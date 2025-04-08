@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1-labs
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
+ARG BUILD_CONFIGURATION
 WORKDIR /src
 
 COPY --parents=true */*.csproj .
@@ -12,12 +12,12 @@ RUN dotnet build FxBot/FxBot.csproj -c ${BUILD_CONFIGURATION} -o /src/build --no
 
 
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
+ARG BUILD_CONFIGURATION
 RUN dotnet publish FxBot/FxBot.csproj -c ${BUILD_CONFIGURATION} -o /app/publish
 
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
-ARG PYTHON_ENV=py_env
+ARG PYTHON_ENV
 WORKDIR /app
 COPY --from=publish /app/publish .
 
