@@ -1,0 +1,20 @@
+services:
+  fxbot:
+    build:
+      context: .
+      args:
+      - BUILD_CONFIGURATION=Release
+      - PYTHON_ENV=py_env
+    image: fedark/fxbot
+    container_name: fxbot
+    environment:
+      - Bot__Token=${Bot__Token}
+    depends_on:
+      - redis
+
+  redis:
+    build: .
+    image: redis
+    container_name: redis
+    ports:
+      - 6379:6379
