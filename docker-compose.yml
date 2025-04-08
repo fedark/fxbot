@@ -7,6 +7,8 @@ services:
       - PYTHON_ENV=py_env
     image: fedark/fxbot
     container_name: fxbot
+    environment:
+      - Bot__Token=${Bot__Token}
     depends_on:
       - redis
 
