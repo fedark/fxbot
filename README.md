@@ -18,9 +18,9 @@ There are 3 separate projects:
 - `BotInfrastructure` to communicate with telegram API. It contains the bot client implementation as well as supported bot commands. The commands handling is implemented using the Chain of Responsibility pattern: each command tries to process a request, if it's not possible the flow goes to the next command in the chain
 - `FxBot` contains an entry point of the program as well as the settings/services configuration using `HostBuilder`
 
-All projects are structured in the way that abstractions and implementations are separated, so that it can be easily splitted in future to separate projects making the project architechture even more clean.
+All projects are structured in the way that abstractions and implementations are separated, so that it can be easily splitted in future to separate projects making the architechture even more clean.
 
 Also, there is docker support. The `docker-compose` configuration includes:
 - `fxbot` service for the program
-- `redis` service for caching (currently, the rate dynamics images are being cached since it takes quite a time to get response from API over a long period and plotting an image using external program
+- `redis` service for caching (currently, the rate dynamics images are being cached since it takes quite a time to get response from API over a long period and plotting an image using external program)
 - `Bot__Token` environment variable required to build the image, it should be set within a terminal
