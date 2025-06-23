@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace QuoteService.Model;
 
-public class FxRate
+public class FxRateApiModel
 {
 	[JsonProperty("Cur_ID")]
 	public int CurrencyId { get; set; }

@@ -1,4 +1,4 @@
-﻿namespace QuoteService.Model;
+﻿namespace QuoteService.Model.Configuration;
 
 public class FxRateApiConfiguration
 {
@@ -6,5 +6,4 @@ public class FxRateApiConfiguration
     public required string PathBeforeDenomination { get; set; }
     public required string PathAfterDenomination { get; set; }
     public required string RequestDateFormat { get; set; }
-
 }

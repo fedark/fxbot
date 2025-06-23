@@ -5,7 +5,7 @@ using System;
 
 namespace QuoteService.Interface;
 
-public interface IFxRateClient
+public interface IFxRateApiClient
 {
 	Task<IEnumerable<FxRate>> GetHistoryAsync(DateTime startDate, DateTime endDate);
 }

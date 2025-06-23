@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "QuoteService.Grpc";
+
+message FxRateRequest {
+	google.protobuf.Timestamp date = 1;
+}
+
+message FxRateResponse {
+	double fx_rate = 1;
+}
+
+message ChartRequest {
+	google.protobuf.Timestamp start_date = 1;
+}
+
+message ChartChunk {
+	bytes chunk = 1;
+	sint32 size = 2;
+}
+
+service FxRateService {
+	rpc GetFxRate (FxRateRequest) returns (FxRateResponse);
+	rpc GetChart (ChartRequest) returns (stream ChartChunk);
+}

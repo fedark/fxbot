@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace QuoteService.Model;
+namespace QuoteService.Model.Configuration;
 
 public class ScriptConfiguration
 {

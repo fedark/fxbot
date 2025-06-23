@@ -7,17 +7,19 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using QuoteService.Interface;
 using QuoteService.Model;
+using Mapster;
+using QuoteService.Model.Configuration;
 
 namespace QuoteService.Impl;
 
-public class FxRateClient : HttpClient, IFxRateClient
+public class FxRateApiClient : HttpClient, IFxRateApiClient
 {
 	private readonly IOptions<FxRateApiConfiguration> _clientOptions;
 
-	public FxRateClient(IOptions<FxRateApiConfiguration> clientOptions)
+    public FxRateApiClient(IOptions<FxRateApiConfiguration> clientOptions)
 	{
 		_clientOptions = clientOptions;
-		BaseAddress = new Uri(clientOptions.Value.BaseUrl, UriKind.Absolute);
+        BaseAddress = new Uri(clientOptions.Value.BaseUrl, UriKind.Absolute);
 	}
 
 	public async Task<IEnumerable<FxRate>> GetHistoryAsync(DateTime startDate, DateTime endDate)
@@ -27,12 +29,12 @@ public class FxRateClient : HttpClient, IFxRateClient
 		var beforeDenominationResult = await ProcessRequestAsync($"{_clientOptions.Value.PathBeforeDenomination}{query}").ConfigureAwait(false);
 		var afterDenominationResult = await ProcessRequestAsync($"{_clientOptions.Value.PathAfterDenomination}{query}").ConfigureAwait(false);
 
-		var result = new List<FxRate>();
-		
+		var result = new List<FxRateApiModel>();
+
 		result.AddRange(beforeDenominationResult);
 		result.AddRange(afterDenominationResult);
-		
-		return result;
+
+		return result.Adapt<IEnumerable<FxRate>>();
 	}
 
 	private string BuildQuery(DateTime startDate, DateTime endDate)
@@ -45,11 +47,11 @@ public class FxRateClient : HttpClient, IFxRateClient
 		return $"?{query}";
 	}
 
-	private async Task<IEnumerable<FxRate>> ProcessRequestAsync(string uri)
+	private async Task<IEnumerable<FxRateApiModel>> ProcessRequestAsync(string uri)
 	{
 		var response = await GetAsync(uri).ConfigureAwait(false);
 		var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-		var result = JsonConvert.DeserializeObject<IEnumerable<FxRate>>(content);
+		var result = JsonConvert.DeserializeObject<IEnumerable<FxRateApiModel>>(content);
 
 		return result ?? [];
 	}
