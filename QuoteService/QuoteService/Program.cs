@@ -9,8 +9,8 @@ using QuoteService.Model.Configuration;
 var builder = WebApplication.CreateSlimBuilder(args);
 
 MapConfiguration(builder.Configuration, builder.Services);
-ConfigureServices(builder.Services);
 
+builder.Services.AddSingleton<IFxRateApiClient, FxRateApiClient>();
 builder.Services.AddGrpc();
 
 var app = builder.Build();
@@ -27,9 +27,4 @@ static void MapConfiguration(IConfiguration configuration, IServiceCollection se
     services.Configure<FxRateApiConfiguration>(configuration.GetRequiredSection("FxRateApi"));
     services.Configure<ScriptConfiguration>(configuration.GetRequiredSection("Script"));
     services.Configure<ResponseConfiguration>(configuration.GetRequiredSection("Response"));
-}
-
-static void ConfigureServices(IServiceCollection services)
-{
-    services.AddSingleton<IFxRateApiClient, FxRateApiClient>();
 }

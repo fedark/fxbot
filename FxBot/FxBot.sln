@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FxBot", "FxBot\FxBot.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotInfrastructure", "BotInfrastructure\BotInfrastructure.csproj", "{A18DDAA1-5927-43DF-82A8-48065C427613}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuoteService.Client", "QuoteService.Client\QuoteService.Client.csproj", "{2B3B09DE-CB4D-4F2D-BA67-DC53238BB1CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,14 +19,14 @@ Global
 		{1CEFBBCF-162A-4949-AF9B-BF437252E50C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CEFBBCF-162A-4949-AF9B-BF437252E50C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1CEFBBCF-162A-4949-AF9B-BF437252E50C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{713D39DE-7525-4CD0-BFE9-71456CA6619F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{713D39DE-7525-4CD0-BFE9-71456CA6619F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{713D39DE-7525-4CD0-BFE9-71456CA6619F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{713D39DE-7525-4CD0-BFE9-71456CA6619F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A18DDAA1-5927-43DF-82A8-48065C427613}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A18DDAA1-5927-43DF-82A8-48065C427613}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A18DDAA1-5927-43DF-82A8-48065C427613}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A18DDAA1-5927-43DF-82A8-48065C427613}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B3B09DE-CB4D-4F2D-BA67-DC53238BB1CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B3B09DE-CB4D-4F2D-BA67-DC53238BB1CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B3B09DE-CB4D-4F2D-BA67-DC53238BB1CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B3B09DE-CB4D-4F2D-BA67-DC53238BB1CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -4,7 +4,7 @@ using BotInfrastructure.Interface;
 using BotInfrastructure.Interface.Command;
 using BotInfrastructure.Model;
 using Microsoft.Extensions.Options;
-using QuoteService.Interface;
+using QuoteService.Client;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 

@@ -2,7 +2,7 @@
 using BotInfrastructure.Interface;
 using BotInfrastructure.Model;
 using Microsoft.Extensions.Options;
-using QuoteService.Interface;
+using QuoteService.Client;
 using System.Text;
 using System.Text.RegularExpressions;
 using BotInfrastructure.Interface.Command;

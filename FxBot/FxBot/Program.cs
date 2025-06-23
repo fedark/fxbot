@@ -9,9 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using QuoteService.Impl;
-using QuoteService.Interface;
-using QuoteService.Model;
+using QuoteService.Client;
 
 var appBuilder = Host.CreateDefaultBuilder(args);
 
@@ -19,7 +17,7 @@ appBuilder.ConfigureServices((context, services) =>
 {
 	MapConfiguration(context.Configuration, services);
 	ConfigureCaching(context.Configuration, services);
-	ConfigureServices(services);
+	ConfigureServices(context.Configuration, services);
 
 	services.AddHostedService<BotWorker>();
 });
@@ -44,9 +42,6 @@ static void MapConfiguration(IConfiguration configuration, IServiceCollection se
 	});
 
 	services.Configure<HistoryCommandConfiguration>(configuration.GetRequiredSection("Bot:Commands:History"));
-
-	services.Configure<FxRateApiConfiguration>(configuration.GetRequiredSection("QuoteService:FxRateApi"));
-	services.Configure<ScriptConfiguration>(configuration.GetRequiredSection("QuoteService:Script"));
 }
 
 static void ConfigureCaching(IConfiguration configuration, IServiceCollection services)
@@ -60,10 +55,13 @@ static void ConfigureCaching(IConfiguration configuration, IServiceCollection se
 	services.AddSingleton<ICacheService, CacheService>();
 }
 
-static void ConfigureServices(IServiceCollection services)
+static void ConfigureServices(IConfiguration configuration, IServiceCollection services)
 {
-	services.AddSingleton<IFxRateClient, FxRateClient>();
-	services.AddSingleton<IFxRateService, FxRateService>();
+	services.AddQuoteService(options =>
+	{
+		var target = configuration.GetRequired("QuoteService:Target");
+		options.GrpcTarget = target;
+	});
 
 	services.AddSingleton<IRateCommand, RateCommand>();
 	services.AddSingleton<IConvertCommand, ConvertCommand>();

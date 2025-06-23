@@ -26,7 +26,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BotInfrastructure\BotInfrastructure.csproj" />
-    <ProjectReference Include="..\QuoteService\QuoteService.csproj" />
   </ItemGroup>
   
 </Project>

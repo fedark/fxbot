@@ -68,6 +68,7 @@ public class FxRateServiceImpl(IOptions<ScriptConfiguration> scriptOptions,
 			{
 				Chunk = ByteString.CopyFrom(buffer, 0, readSize),
 				Size = readSize,
+				FileSize = fileSize
 			};
 			await responseStream.WriteAsync(chunk).ConfigureAwait(false);
 		}

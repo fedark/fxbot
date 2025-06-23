@@ -2,5 +2,5 @@
 
 public interface ICacheService
 {
-    Task<byte[]> GetOrAddAsync(string key, Func<Task<Stream>> factory);
+    Task<byte[]> GetOrAddAsync(string key, Func<Task<byte[]>> factory);
 }

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
 
-option csharp_namespace = "QuoteService.Grpc";
+option csharp_namespace = "QuoteService.Grpc.Client";
 
 message FxRateRequest {
 	google.protobuf.Timestamp date = 1;
